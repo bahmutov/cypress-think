@@ -1,3 +1,5 @@
+// TODO: abstract into pluggable AI clients
+
 import OpenAI from 'openai'
 
 const openAiApiKey = process.env['OPEN_AI_API_KEY']
@@ -25,6 +27,8 @@ output only the Cypress command without any explanations or additional text.
 `
 
 export async function think({ prompt, html }) {
+  // TODO: cache the response based on the prompt and HTML hash
+
   const model = 'gpt-4.1'
 
   const input = `
@@ -48,10 +52,3 @@ export async function think({ prompt, html }) {
 
   return output
 }
-
-// example
-// const prompt = 'enter "Gleb B" into the username field'
-// const html = `
-//   <form _ngcontent-swh-c194="" novalidate="" class="form-inline ng-untouched ng-pristine ng-valid"><input _ngcontent-swh-c194="" type="text" nbinput="" fullwidth="" placeholder="Jane Doe" class="input-full-width size-medium status-basic shape-rectangle nb-transition"><input _ngcontent-swh-c194="" type="text" nbinput="" fullwidth="" placeholder="Email" class="input-full-width size-medium status-basic shape-rectangle nb-transition"><nb-checkbox _ngcontent-swh-c194="" _nghost-swh-c111="" class="status-basic nb-transition"><label _ngcontent-swh-c111="" class="label"><input _ngcontent-swh-c111="" type="checkbox" class="native-input visually-hidden"><span _ngcontent-swh-c111="" class="custom-checkbox"><!----><!----></span><span _ngcontent-swh-c111="" class="text">Remember me</span></label></nb-checkbox><button _ngcontent-swh-c194="" type="submit" nbbutton="" status="primary" aria-disabled="false" tabindex="0" class="appearance-filled size-medium shape-rectangle status-primary nb-transition">Submit</button></form>
-// `
-// think({ prompt, html })

@@ -6,5 +6,6 @@ it('enters text into input', () => {
       enter "gleb@acme.co" into the email field
       click on the submit button
     `)
+
   cy.get('.form-inline').should('have.class', 'ng-submitted')
 })

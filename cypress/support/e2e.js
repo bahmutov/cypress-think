@@ -4,8 +4,6 @@ Cypress.Commands.add(
     prevSubject: 'element',
   },
   (subject, prompt) => {
-    console.log({ subject, prompt })
-
     if (!prompt) {
       throw new Error('A prompt is required for the think command')
     }
@@ -25,6 +23,7 @@ Cypress.Commands.add(
           'cypress:think',
           {
             prompt: line,
+            // TODO: make sure to grab the latest HTML after previous commands
             html: subject?.html() || '',
           },
           { log: false },

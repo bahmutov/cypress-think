@@ -1,15 +1,21 @@
 {
   "name": "cypress-think",
   "version": "1.0.0",
-  "description": "",
+  "description": "Create Cypress tests using your own AI",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "cypress",
+    "cypress-plugin",
+    "ai",
+    "testing",
+    "automation"
+  ],
+  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE.md",
   "devDependencies": {
     "cypress": "^15.5.0",
     "openai": "^6.7.0",
