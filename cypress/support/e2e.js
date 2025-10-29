@@ -37,11 +37,11 @@ Cypress.Commands.add(
             testTitle: Cypress.currentTest.titlePath.join(' > '),
           },
           { log: false },
-        ).then(({ command, fromCache }) => {
+        ).then(({ command, totalTokens, fromCache }) => {
           if (fromCache) {
-            cy.log(`🤖⚡️ ${command}`)
+            cy.log(`🤖⚡️ ${command} (${totalTokens} tokens)`)
           } else {
-            cy.log(`🤖 ${command}`)
+            cy.log(`🤖 ${command} (${totalTokens} tokens)`)
           }
           // execute the command
           // eslint-disable-next-line no-eval
