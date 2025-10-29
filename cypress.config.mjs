@@ -1,6 +1,8 @@
 import { defineConfig } from 'cypress'
+import { think } from './src/think.mjs'
 
 export default defineConfig({
+  defaultBrowser: 'electron',
   e2e: {
     // baseUrl, etc
     baseUrl: 'https://playground.bondaracademy.com/',
@@ -8,8 +10,12 @@ export default defineConfig({
     scrollBehavior: 'center',
     defaultCommandTimeout: 1000,
     setupNodeEvents(on, config) {
-      // implement node event listeners here
-      // and load any plugins that require the Node environment
+      on('task', {
+        'cypress:think': async ({ prompt, html }) => {
+          const result = await think({ prompt, html })
+          return result || null
+        },
+      })
     },
   },
 })

@@ -1,7 +1,7 @@
 Cypress.Commands.add(
   'think',
   {
-    prevSubject: 'optional',
+    prevSubject: 'element',
   },
   (subject, prompt) => {
     console.log({ subject, prompt })
@@ -17,9 +17,24 @@ Cypress.Commands.add(
       .split('\n')
       .map((line) => line.trim())
 
-    // process each line
-    lines.forEach((line, k) => {
-      cy.log(`**step ${k + 1}: ${line}**`)
+    // process each line within the subject element
+    cy.wrap(subject, { log: false }).within(() => {
+      lines.forEach((line, k) => {
+        cy.log(`**step ${k + 1}: ${line}**`)
+        cy.task(
+          'cypress:think',
+          {
+            prompt: line,
+            html: subject?.html() || '',
+          },
+          { log: false },
+        ).then((command) => {
+          cy.log(`🤖 ${command}`)
+          // execute the command
+          // eslint-disable-next-line no-eval
+          eval(command)
+        })
+      })
     })
   },
 )
