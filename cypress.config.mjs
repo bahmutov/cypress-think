@@ -1,5 +1,6 @@
 import { defineConfig } from 'cypress'
 import { think } from './src/think.mjs'
+import { readAgentInstructions } from './src/agent-instructions.mjs'
 
 async function hashString(str, algorithm = 'SHA-256') {
   // algorithm can be 'SHA-1', 'SHA-256', 'SHA-384', or 'SHA-512'
@@ -15,6 +16,12 @@ async function hashString(str, algorithm = 'SHA-256') {
 }
 
 const promptCache = {}
+
+// Read agent instructions once at startup
+let agentInstructions = null
+;(async () => {
+  agentInstructions = await readAgentInstructions()
+})()
 
 export default defineConfig({
   defaultBrowser: 'electron',
@@ -43,7 +50,11 @@ export default defineConfig({
               fromCache: true,
             }
           }
-          const result = await think({ prompt, html })
+          const result = await think({
+            prompt,
+            html,
+            agentInstructions,
+          })
           promptCache[promptHash] = result
           return { command: result, fromCache: false }
         },

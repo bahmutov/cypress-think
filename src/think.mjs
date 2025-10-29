@@ -17,7 +17,7 @@ const client = new OpenAI({
   baseURL: openAiBaseUrl,
 })
 
-const instructions = `
+const baseInstructions = `
 You are an expert Cypress.io test developer.
 Given the current HTML of a web page or its partial HTML snippet,
 and a prompt describing what to test on that page,
@@ -26,10 +26,24 @@ that best matches the prompt and HTML.
 output only the Cypress command without any explanations or additional text.
 `
 
-export async function think({ prompt, html }) {
+export async function think({
+  prompt,
+  html,
+  agentInstructions = null,
+}) {
   // TODO: cache the response based on the prompt and HTML hash
 
   const model = 'gpt-4.1'
+
+  // Combine base instructions with agent instructions if provided
+  let instructions = baseInstructions
+  if (agentInstructions) {
+    instructions = `${baseInstructions}
+
+Additional project-specific instructions:
+${agentInstructions}
+`
+  }
 
   const input = `
     HTML:
