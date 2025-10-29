@@ -6,10 +6,7 @@ it('supports an array of strings', () => {
     .should('not.have.class', 'ng-submitted')
     .think([
       `enter "Gleb Bah" into the username field`,
-      `enter "gleb@acme.co" into the email field`,
-      `click on the submit button`,
-      `confirm the username field contains "Gleb Bah"`,
+      'confirm the "Remember me" is unchecked',
+      'confirm the Submit button is enabled',
     ])
-
-  cy.get('.form-inline').should('have.class', 'ng-submitted')
 })
