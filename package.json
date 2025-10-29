@@ -4,6 +4,9 @@
   "description": "Create Cypress tests using your own AI",
   "main": "index.js",
   "type": "module",
+  "files": [
+    "src"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
