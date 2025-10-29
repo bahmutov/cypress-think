@@ -39,13 +39,18 @@ export default defineConfig({
           if (promptHash in promptCache) {
             console.log('Using cached command for prompt:', prompt)
             return {
-              command: promptCache[promptHash],
+              command: promptCache[promptHash].command,
+              totalTokens: promptCache[promptHash].totalTokens,
               fromCache: true,
             }
           }
           const result = await think({ prompt, html })
           promptCache[promptHash] = result
-          return { command: result, fromCache: false }
+          return {
+            command: result.command,
+            totalTokens: result.totalTokens,
+            fromCache: false,
+          }
         },
       })
     },

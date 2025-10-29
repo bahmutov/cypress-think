@@ -50,5 +50,8 @@ export async function think({ prompt, html }) {
   console.error('response usage:')
   console.error(response.usage)
 
-  return output
+  return {
+    command: output,
+    totalTokens: response.usage?.total_tokens || 0,
+  }
 }
