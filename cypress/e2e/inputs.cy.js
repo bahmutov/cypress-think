@@ -1,3 +1,5 @@
+// @ts-check
+
 it('enters text into input', () => {
   cy.visit('/pages/forms/layouts')
   cy.get('.form-inline').should('not.have.class', 'ng-submitted')

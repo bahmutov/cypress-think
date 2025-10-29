@@ -22,12 +22,15 @@ Cypress.Commands.add(
     if (!prompt) {
       throw new Error('A prompt is required for the think command')
     }
+    if (Array.isArray(prompt)) {
+    }
+
     cy.log('**thinking...**')
 
     // split prompt into individual lines
-    const lines = prompt
-      .trim()
-      .split('\n')
+    const lines = (
+      Array.isArray(prompt) ? prompt : prompt.trim().split('\n')
+    )
       .map((line) => line.trim())
       // remove empty lines
       .filter(Boolean)
