@@ -12,6 +12,7 @@ declare global {
        * and creates Cypress commands to execute it.
        * Each line is processed at a time, and it uses
        * the current DOM html as context.
+       * Yields the original element subject.
        *
        * @example
        * cy.get('form').think(`
@@ -20,12 +21,14 @@ declare global {
        *   click on the submit button
        * `)
        */
-      think(prompt: string): void
+      think(prompt: string): Chainable<Subject>
+
       /**
        * Takes an array of prompt strings
        * and creates Cypress commands to execute them.
        * Each line is processed at a time, and it uses
        * the current DOM html as context.
+       * Yields the original element subject.
        *
        * @example
        * cy.get('form').think([
@@ -34,7 +37,7 @@ declare global {
        *   `click on the submit button`,
        * ])
        */
-      think(prompts: string[]): void
+      think(prompts: string[]): Chainable<Subject>
     }
   }
 }
