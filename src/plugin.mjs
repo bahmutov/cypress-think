@@ -289,6 +289,7 @@ export default function cypressThinkPlugin(on, config, options = {}) {
         agentInstructions,
       })
       promptCache[promptHash] = {
+        prompt,
         ...result,
         specFilename,
         testTitle,
