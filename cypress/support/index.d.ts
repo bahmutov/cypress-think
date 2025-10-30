@@ -15,7 +15,16 @@ declare global {
        * Yields the original element subject.
        *
        * @example
+       * // Using as a child command
        * cy.get('form').think(`
+       *   enter "myusername" into the username field
+       *   enter "mypassword" into the password field
+       *   click on the submit button
+       * `)
+       * @example
+       * // Using as a standalone command
+       * cy.think(`
+       *   go to the login page
        *   enter "myusername" into the username field
        *   enter "mypassword" into the password field
        *   click on the submit button
