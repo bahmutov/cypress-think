@@ -16,6 +16,8 @@ Cypress.Commands.add(
     }
     Cypress.log(logProps)
 
+    const generatedCommands = []
+
     // split prompt into individual lines
     const lines = (
       Array.isArray(prompt) ? prompt : prompt.trim().split('\n')
@@ -49,11 +51,48 @@ Cypress.Commands.add(
             // execute the command
             // eslint-disable-next-line no-eval
             eval(command)
+
+            cy.then(() => {
+              // the command has succeeded
+              generatedCommands.push(command)
+            })
           })
         })
       })
       .then(() => {
         // the entire prompt has worked!
+        cy.log('**thinking accomplished**')
+          .wait(100)
+          .then(() => {
+            // get the very last command element in the Cypress Command Log
+            const logElements = window.top.document.querySelectorAll(
+              '.command.command-name-log',
+            )
+            const lastLogElement = logElements[logElements.length - 1]
+            if (!lastLogElement) {
+              return
+            }
+            const controls = lastLogElement.querySelector(
+              '.command-controls',
+            )
+            if (!controls) {
+              return
+            }
+            const saveButton = document.createElement('button')
+            saveButton.innerText = '💾'
+            saveButton.title =
+              'Replace prompt with the generated code'
+            saveButton.onclick = (e) => {
+              e.stopPropagation()
+              console.log('Saving prompt NOT IMPLEMENTED YET')
+              console.log(prompt)
+              const generated = generatedCommands.join('\n')
+              console.log(generated)
+              // TODO: send the prompt and the replacement to the plugin process
+              // together with the spec filename and test title
+            }
+            controls.appendChild(saveButton)
+          })
       })
   },
 )
