@@ -2,6 +2,9 @@ import { defineConfig } from 'cypress'
 import { think } from './src/think.mjs'
 import { readAgentInstructions } from './src/agent-instructions.mjs'
 import fastify from 'fastify'
+import { readFile, writeFile } from 'fs/promises'
+import { existsSync } from 'fs'
+import { join } from 'path'
 
 async function hashString(str, algorithm = 'SHA-256') {
   // algorithm can be 'SHA-1', 'SHA-256', 'SHA-384', or 'SHA-512'
@@ -16,11 +19,39 @@ async function hashString(str, algorithm = 'SHA-256') {
   return hex
 }
 
-const promptCache = {}
+const CACHE_FILE_PATH = join(process.cwd(), 'thoughts.json')
+
+// Load promptCache from file if it exists
+let promptCache = {}
+async function loadPromptCache() {
+  if (existsSync(CACHE_FILE_PATH)) {
+    try {
+      const content = await readFile(CACHE_FILE_PATH, 'utf-8')
+      promptCache = JSON.parse(content)
+      console.log('Loaded prompt cache from thoughts.json')
+    } catch (error) {
+      console.warn('Failed to load prompt cache:', error.message)
+    }
+  }
+}
+
+// Save promptCache to file
+async function savePromptCache() {
+  try {
+    await writeFile(
+      CACHE_FILE_PATH,
+      JSON.stringify(promptCache, null, 2),
+      'utf-8',
+    )
+  } catch (error) {
+    console.error('Failed to save prompt cache:', error.message)
+  }
+}
 
 // Read agent instructions once at startup
 let agentInstructions = null
 ;(async () => {
+  await loadPromptCache()
   agentInstructions = await readAgentInstructions()
 })()
 
@@ -180,6 +211,7 @@ export default defineConfig({
             agentInstructions,
           })
           promptCache[promptHash] = result
+          await savePromptCache()
           return {
             command: result.command,
             totalTokens: result.totalTokens,
