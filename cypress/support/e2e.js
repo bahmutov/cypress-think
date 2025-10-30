@@ -39,9 +39,9 @@ Cypress.Commands.add(
           { log: false },
         ).then(({ command, totalTokens, fromCache }) => {
           if (fromCache) {
-            cy.log(`🤖⚡️ ${command} (${totalTokens} tokens)`)
+            cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
           } else {
-            cy.log(`🤖 ${command} (${totalTokens} tokens saved)`)
+            cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
           }
           // execute the command
           // eslint-disable-next-line no-eval
