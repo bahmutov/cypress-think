@@ -86,7 +86,12 @@ Cypress.Commands.add(
               e.stopPropagation()
               console.log('Saving prompt NOT IMPLEMENTED YET')
               console.log(prompt)
-              const generated = generatedCommands.join('\n')
+              // since we are working with cy.within to generate the code
+              // we should wrap the generated commands too
+              const generated =
+                '.within(() => {\n' +
+                generatedCommands.join('\n') +
+                '\n})'
               console.log(generated)
               // TODO: send the prompt and the replacement to the plugin process
               // together with the spec filename and test title
