@@ -64,7 +64,7 @@ Cypress.Commands.add(
       .then(() => {
         // the entire prompt has worked!
         cy.log('**thinking accomplished**')
-          .wait(100)
+          .wait(100, { log: false })
           .then(() => {
             // TODO: add support for replacing .think(array of strings)
             if (Array.isArray(prompt)) {
