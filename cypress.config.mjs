@@ -1,5 +1,6 @@
 import { defineConfig } from 'cypress'
 import { think } from './src/think.mjs'
+// import { think } from './src/ollama-client.mjs'
 import { readAgentInstructions } from './src/agent-instructions.mjs'
 import fastify from 'fastify'
 import { readFile, writeFile } from 'fs/promises'
