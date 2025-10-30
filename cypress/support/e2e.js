@@ -90,6 +90,32 @@ Cypress.Commands.add(
               console.log(generated)
               // TODO: send the prompt and the replacement to the plugin process
               // together with the spec filename and test title
+
+              fetch('http://localhost:4321/save-generated-thought', {
+                method: 'POST',
+                cors: 'cors',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  specFilename: Cypress.spec.relative,
+                  testTitle:
+                    Cypress.currentTest.titlePath.join(' > '),
+                  prompt,
+                  generatedCode: generated,
+                }),
+              }).then((response) => {
+                if (response.ok) {
+                  saveButton.disabled = true
+                  saveButton.innerText = '✅'
+                } else {
+                  console.error(
+                    'Failed to save generated code',
+                    response.statusText,
+                  )
+                  saveButton.innerText = '❌'
+                }
+              })
             }
             controls.appendChild(saveButton)
           })

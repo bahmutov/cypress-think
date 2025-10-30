@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress'
 import { think } from './src/think.mjs'
 import { readAgentInstructions } from './src/agent-instructions.mjs'
+import fastify from 'fastify'
 
 async function hashString(str, algorithm = 'SHA-256') {
   // algorithm can be 'SHA-1', 'SHA-256', 'SHA-384', or 'SHA-512'
@@ -22,6 +23,40 @@ let agentInstructions = null
 ;(async () => {
   agentInstructions = await readAgentInstructions()
 })()
+
+// prepare a server to receive "save prompt" requests from the browser
+const server = fastify({ logger: false })
+server.options('/save-generated-thought', (req, res) => {
+  res
+    .headers({
+      Allow: 'OPTIONS, POST',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'content-type',
+    })
+    .status(200)
+    .send()
+})
+server.post('/save-generated-thought', async (req, res) => {
+  const { specFilename, testTitle, prompt, generatedCode } = req.body
+
+  // Save the generated code to a file or database
+  // ...
+  console.log('TODO: save generated code for prompt:', {
+    specFilename,
+    testTitle,
+  })
+
+  res
+    .headers({
+      'access-control-allow-origin': '*',
+      'access-control-request-headers': 'Content-Type',
+    })
+    .status(200)
+    .send({ success: true })
+})
+server.listen({ port: 4321 }).then(() => {
+  console.log('cy.think server listening on port 4321')
+})
 
 export default defineConfig({
   defaultBrowser: 'electron',
