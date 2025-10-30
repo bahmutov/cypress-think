@@ -27,13 +27,14 @@ output only the Cypress command without any explanations or additional text.
 `
 
 export async function think({
+  model,
   prompt,
   html,
   agentInstructions = null,
 }) {
-  // TODO: cache the response based on the prompt and HTML hash
-
-  const model = 'gpt-4.1'
+  if (!model) {
+    model = 'gpt-4.1'
+  }
 
   // Combine base instructions with agent instructions if provided
   let instructions = baseInstructions

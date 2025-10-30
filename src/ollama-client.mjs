@@ -14,11 +14,14 @@ Follow the HTML structure to find the best selectors.
 `
 
 export async function think({
+  model,
   prompt,
   html,
   agentInstructions = null,
 }) {
-  const model = 'codellama'
+  if (!model) {
+    model = 'codellama'
+  }
 
   // Combine base instructions with agent instructions if provided
   let instructions = baseInstructions

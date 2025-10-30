@@ -1,7 +1,7 @@
 // @ts-check
 
-import { think } from './think.mjs'
-// import { think } from './src/ollama-client.mjs'
+import { think as thinkOpenAi } from './think.mjs'
+import { think as thinkOllama } from './ollama-client.mjs'
 import { readAgentInstructions } from './agent-instructions.mjs'
 import fastify from 'fastify'
 import { readFile, writeFile } from 'fs/promises'
@@ -229,9 +229,23 @@ server.listen({ port: 4321 }).then(() => {
 })
 
 export default function cypressThinkPlugin(on, config, options = {}) {
+  const client = options.client || 'openai' // or 'ollama'
+
+  let think = null
+  let model = options.model || null
+  if (client === 'openai') {
+    think = thinkOpenAi
+    model = model || 'gpt-4.1'
+  } else if (client === 'ollama') {
+    think = thinkOllama
+    model = model || 'codellama'
+  } else {
+    throw new Error('Unsupported client: ' + client)
+  }
+
   on('task', {
-    'cypress:think': async (options) => {
-      const { prompt, html, specFilename, testTitle } = options
+    'cypress:think': async (thinkOptions) => {
+      const { prompt, html, specFilename, testTitle } = thinkOptions
 
       log('Received think task for prompt: %s', prompt)
       log(
@@ -255,6 +269,7 @@ export default function cypressThinkPlugin(on, config, options = {}) {
         }
       }
       const result = await think({
+        model,
         prompt,
         html,
         agentInstructions,
