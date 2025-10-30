@@ -210,7 +210,11 @@ export default defineConfig({
             html,
             agentInstructions,
           })
-          promptCache[promptHash] = result
+          promptCache[promptHash] = {
+            ...result,
+            specFilename,
+            testTitle,
+          }
           await savePromptCache()
           return {
             command: result.command,
