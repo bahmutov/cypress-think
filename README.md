@@ -26,6 +26,8 @@ Each prompt line is processed separately. Each result is cached to avoid reinven
 
 ![Caching symbol](./images/caching.png)
 
+The cache is loaded and saved in the local `thoughts.json` file.
+
 ## Saving generated code
 
 If the entire prompt finishes successfully, a save icon 💾 appears next to the "thinking" log message
