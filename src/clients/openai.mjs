@@ -68,5 +68,7 @@ ${agentInstructions}
   return {
     command: output,
     totalTokens: response.usage?.total_tokens || 0,
+    client: 'openai',
+    model,
   }
 }

@@ -245,13 +245,24 @@ export default function cypressThinkPlugin(on, config, options = {}) {
 
   on('task', {
     'cypress:think': async (thinkOptions) => {
-      const { prompt, html, specFilename, testTitle } = thinkOptions
+      const { prompt, specFilename, testTitle } = thinkOptions
+      let { html } = thinkOptions
 
       log('Received think task for prompt: %s', prompt)
       log(
         'Start of HTML if any: %s',
         html ? html.slice(0, 100) : 'no html',
       )
+
+      const MAX_HTML_LENGTH = 10000
+      if (html.length > MAX_HTML_LENGTH) {
+        log(
+          'HTML length is %d characters, truncating to %d',
+          html.length,
+          MAX_HTML_LENGTH,
+        )
+        html = html.slice(0, MAX_HTML_LENGTH)
+      }
 
       const promptHash = await hashString(
         specFilename + testTitle + prompt,
@@ -262,10 +273,13 @@ export default function cypressThinkPlugin(on, config, options = {}) {
 
       if (promptHash in promptCache) {
         console.log('Using cached command for prompt:', prompt)
+        const cached = promptCache[promptHash]
         return {
-          command: promptCache[promptHash].command,
-          totalTokens: promptCache[promptHash].totalTokens,
+          command: cached.command,
+          totalTokens: cached.totalTokens,
           fromCache: true,
+          client: cached.client,
+          model: cached.model,
         }
       }
       const result = await think({
@@ -284,6 +298,8 @@ export default function cypressThinkPlugin(on, config, options = {}) {
         command: result.command,
         totalTokens: result.totalTokens,
         fromCache: false,
+        client: result.client,
+        model: result.model,
       }
     },
   })

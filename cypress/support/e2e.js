@@ -22,6 +22,7 @@ Cypress.Commands.add(
     Cypress.log(logProps)
 
     const generatedCommands = []
+    let lastCommand = null
 
     // split prompt into individual lines
     const lines = (
@@ -47,29 +48,37 @@ Cypress.Commands.add(
             testTitle: Cypress.currentTest.titlePath.join(' > '),
           },
           { log: false },
-        ).then(({ command, totalTokens, fromCache }) => {
-          if (fromCache) {
-            cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
-          } else {
-            cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
-          }
-          // execute the command
-          // eslint-disable-next-line no-eval
-          eval(command)
+        ).then(
+          ({ command, totalTokens, fromCache, client, model }) => {
+            lastCommand = { client, model }
+            if (fromCache) {
+              cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
+            } else {
+              cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
+            }
+            // execute the command
+            // eslint-disable-next-line no-eval
+            eval(command)
 
-          cy.then(() => {
-            // the command has succeeded
-            // add the original line as the comment for clarity
-            generatedCommands.push(`// ${line}`)
-            generatedCommands.push(command)
-          })
-        })
+            cy.then(() => {
+              // the command has succeeded
+              // add the original line as the comment for clarity
+              generatedCommands.push(`// ${line}`)
+              generatedCommands.push(command)
+            })
+          },
+        )
       })
     }
 
     const finishThinking = () => {
+      let message = '**thinking accomplished**'
+      if (lastCommand && lastCommand.client && lastCommand.model) {
+        message = `**thinking accomplished** (${lastCommand.client} ${lastCommand.model})`
+      }
+
       // the entire prompt has worked!
-      cy.log('**thinking accomplished**')
+      cy.log(message)
         .wait(100, { log: false })
         .then(() => {
           // TODO: add support for replacing .think(array of strings)
@@ -167,8 +176,7 @@ Cypress.Commands.add(
         })
         .then(finishThinking)
     } else {
-      processPromptLines()
-      finishThinking()
+      cy.then(processPromptLines).then(finishThinking)
     }
   },
 )

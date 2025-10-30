@@ -69,5 +69,7 @@ ${agentInstructions}
   return {
     command: output,
     totalTokens: totalTokens,
+    client: 'ollama',
+    model,
   }
 }
