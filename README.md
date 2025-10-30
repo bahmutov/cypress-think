@@ -10,7 +10,15 @@ Produces the following test, see line by line generated commands
 
 ![Passing test](./images/think.png)
 
-Not ready to be reusable yet.
+**Not ready to be reusable yet.**
+
+## Agent instructions
+
+This package automatically discovers your agent instructions and includes them with your prompts, see [agent-instructions.mjs](./src/agent-instructions.mjs)
+
+```
+Found agent instructions in: .github/copilot-instructions.md
+```
 
 ## Caching
 
