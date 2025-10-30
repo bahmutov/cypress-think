@@ -2,6 +2,8 @@
 
 > Create Cypress tests using your own AI
 
+📺 Watch [Introducing cypress-think](https://youtu.be/3qn6QEj2PQ4).
+
 Given `cy.think(...)` command, comes up with accurate Cypress commands line by line
 
 ![Input spec](./images/input.png)
