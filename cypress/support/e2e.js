@@ -54,6 +54,8 @@ Cypress.Commands.add(
 
             cy.then(() => {
               // the command has succeeded
+              // add the original line as the comment for clarity
+              generatedCommands.push(`// ${line}`)
               generatedCommands.push(command)
             })
           })
@@ -64,6 +66,11 @@ Cypress.Commands.add(
         cy.log('**thinking accomplished**')
           .wait(100)
           .then(() => {
+            // TODO: add support for replacing .think(array of strings)
+            if (Array.isArray(prompt)) {
+              return
+            }
+
             // get the very last command element in the Cypress Command Log
             const logElements = window.top.document.querySelectorAll(
               '.command.command-name-log',
@@ -93,8 +100,6 @@ Cypress.Commands.add(
                 generatedCommands.join('\n') +
                 '\n})'
               console.log(generated)
-              // TODO: send the prompt and the replacement to the plugin process
-              // together with the spec filename and test title
 
               fetch('http://localhost:4321/save-generated-thought', {
                 method: 'POST',
@@ -124,6 +129,9 @@ Cypress.Commands.add(
             }
             controls.appendChild(saveButton)
           })
+
+        // always yield the original subject
+        cy.wrap(subject, { log: false })
       })
   },
 )

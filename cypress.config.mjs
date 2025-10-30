@@ -115,18 +115,11 @@ server.post('/save-generated-thought', async (req, res) => {
             const endIndex = index + match.length
             // Split source into lines to apply comments precisely
             const before = originalSource.slice(0, index)
-            const target = originalSource.slice(index, endIndex)
             const after = originalSource.slice(endIndex)
-            const commentedTarget = target
-              .split('\n')
-              .map((line) =>
-                line.startsWith('//') ? line : `// ${line}`,
-              )
-              .join('\n')
-
-            const insertionBlock = `\n${alreadyGeneratedMarker}\n${generatedCode}\n// end cy.think generated code\n`
-            const newSource =
-              before + commentedTarget + insertionBlock + after
+            // Delete the original .think(...) call entirely instead of commenting it out
+            // Avoid adding a leading blank line before the generated code block
+            const insertionBlock = `${alreadyGeneratedMarker}\n${generatedCode}\n// end cy.think generated code`
+            const newSource = before + insertionBlock + after
 
             fs.writeFileSync(absoluteSpecPath, newSource, 'utf8')
             console.log(
