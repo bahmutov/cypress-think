@@ -9,10 +9,12 @@ Cypress.Commands.add(
     if (!prompt) {
       throw new Error('A prompt is required for the think command')
     }
-    if (Array.isArray(prompt)) {
-    }
 
-    cy.log('**thinking...**')
+    const logProps = {
+      name: 'think',
+      message: '**thinking...**',
+    }
+    Cypress.log(logProps)
 
     // split prompt into individual lines
     const lines = (
@@ -23,31 +25,35 @@ Cypress.Commands.add(
       .filter(Boolean)
 
     // process each line within the subject element
-    cy.wrap(subject, { log: false }).within(() => {
-      lines.forEach(async (line, k) => {
-        cy.log(`**step ${k + 1}: ${line}**`)
+    cy.wrap(subject, { log: false })
+      .within(() => {
+        lines.forEach(async (line, k) => {
+          cy.log(`**step ${k + 1}: ${line}**`)
 
-        cy.task(
-          'cypress:think',
-          {
-            prompt: line,
-            // TODO: make sure to grab the latest HTML after previous commands
-            html: subject?.html() || '',
-            specFilename: Cypress.spec.relative,
-            testTitle: Cypress.currentTest.titlePath.join(' > '),
-          },
-          { log: false },
-        ).then(({ command, totalTokens, fromCache }) => {
-          if (fromCache) {
-            cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
-          } else {
-            cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
-          }
-          // execute the command
-          // eslint-disable-next-line no-eval
-          eval(command)
+          cy.task(
+            'cypress:think',
+            {
+              prompt: line,
+              // TODO: make sure to grab the latest HTML after previous commands
+              html: subject?.html() || '',
+              specFilename: Cypress.spec.relative,
+              testTitle: Cypress.currentTest.titlePath.join(' > '),
+            },
+            { log: false },
+          ).then(({ command, totalTokens, fromCache }) => {
+            if (fromCache) {
+              cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
+            } else {
+              cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
+            }
+            // execute the command
+            // eslint-disable-next-line no-eval
+            eval(command)
+          })
         })
       })
-    })
+      .then(() => {
+        // the entire prompt has worked!
+      })
   },
 )
