@@ -1,3 +1,6 @@
+# <span style="color: red; font-size: 2em;">⚠️ Not ready to be used yet.</span>
+
+---
 # cypress-think
 
 > Create Cypress tests using your own AI
@@ -12,7 +15,6 @@ Produces the following test, see line by line generated commands
 
 ![Passing test](./images/think.png)
 
-**Not ready to be reusable yet.**
 
 ## Agent instructions
 
