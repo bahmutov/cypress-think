@@ -1,7 +1,7 @@
 // @ts-check
 
-import { think as thinkOpenAi } from './think.mjs'
-import { think as thinkOllama } from './ollama-client.mjs'
+import { think as thinkOpenAi } from './clients/openai.mjs'
+import { think as thinkOllama } from './clients/ollama.mjs'
 import { readAgentInstructions } from './agent-instructions.mjs'
 import fastify from 'fastify'
 import { readFile, writeFile } from 'fs/promises'
