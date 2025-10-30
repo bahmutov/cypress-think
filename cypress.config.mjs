@@ -5,6 +5,9 @@ import fastify from 'fastify'
 import { readFile, writeFile } from 'fs/promises'
 import { existsSync } from 'fs'
 import { join } from 'path'
+import debug from 'debug'
+
+const log = debug('cypress-think')
 
 async function hashString(str, algorithm = 'SHA-256') {
   // algorithm can be 'SHA-1', 'SHA-256', 'SHA-384', or 'SHA-512'
@@ -32,6 +35,8 @@ async function loadPromptCache() {
     } catch (error) {
       console.warn('Failed to load prompt cache:', error.message)
     }
+  } else {
+    log('Did not find existing thoughts.json cache file')
   }
 }
 
@@ -189,6 +194,12 @@ export default defineConfig({
       on('task', {
         'cypress:think': async (options) => {
           const { prompt, html, specFilename, testTitle } = options
+
+          log('Received think task for prompt: %s', prompt)
+          log(
+            'Start of HTML if any: %s',
+            html ? html.slice(0, 100) : 'no html',
+          )
 
           const promptHash = await hashString(
             specFilename + testTitle + prompt,

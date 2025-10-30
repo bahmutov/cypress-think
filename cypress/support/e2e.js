@@ -35,12 +35,14 @@ Cypress.Commands.add(
       lines.forEach(async (line, k) => {
         cy.log(`**step ${k + 1}: ${line}**`)
 
+        // current html - either the entire page (body) or the subject element
+        const html =
+          subject?.html() || cy.state('document')?.body?.outerHTML
         cy.task(
           'cypress:think',
           {
             prompt: line,
-            // TODO: make sure to grab the latest HTML after previous commands
-            html: subject?.html() || '',
+            html,
             specFilename: Cypress.spec.relative,
             testTitle: Cypress.currentTest.titlePath.join(' > '),
           },
