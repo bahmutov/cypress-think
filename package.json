@@ -2,8 +2,8 @@
   "name": "cypress-think",
   "version": "0.0.0-development",
   "description": "Create Cypress tests using your own AI",
-  "main": "index.js",
-  "types": "cypress/support/index.d.ts",
+  "main": "src/plugin.mjs",
+  "types": "src/index.d.ts",
   "type": "module",
   "files": [
     "src"

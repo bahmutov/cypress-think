@@ -1,4 +1,4 @@
-/// <reference path="../support/index.d.ts" />
+/// <reference path="../../src/index.d.ts" />
 // @ts-check
 
 it('enters text into input', () => {
