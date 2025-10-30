@@ -179,6 +179,45 @@ server.post('/save-generated-thought', async (req, res) => {
     .status(200)
     .send({ success: true })
 })
+server.options('/clear-cached-thoughts', (req, res) => {
+  res
+    .headers({
+      Allow: 'OPTIONS, POST',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'content-type',
+    })
+    .status(200)
+    .send()
+})
+server.post('/clear-cached-thoughts', async (req, res) => {
+  const { specFilename, testTitle } = req.body
+
+  // Clear cached thoughts for the given spec and test title
+  console.log(
+    'Clearing cached thoughts for spec "%s" test "%s"',
+    specFilename,
+    testTitle,
+  )
+  Object.entries(promptCache).forEach(([hash, entry]) => {
+    if (
+      entry.specFilename === specFilename &&
+      entry.testTitle === testTitle
+    ) {
+      delete promptCache[hash]
+      console.log('Deleted cached thought with hash:', hash)
+    }
+  })
+  await savePromptCache()
+
+  res
+    .headers({
+      'access-control-allow-origin': '*',
+      'access-control-request-headers': 'Content-Type',
+    })
+    .status(200)
+    .send({ success: true })
+})
+
 server.listen({ port: 4321 }).then(() => {
   console.log('cy.think server listening on port 4321')
 })

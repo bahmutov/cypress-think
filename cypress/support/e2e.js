@@ -91,20 +91,18 @@ Cypress.Commands.add(
           if (!controls) {
             return
           }
+
           const saveButton = document.createElement('button')
           saveButton.innerText = '💾'
           saveButton.title = 'Replace prompt with the generated code'
           saveButton.onclick = (e) => {
             e.stopPropagation()
-            console.log('Saving prompt NOT IMPLEMENTED YET')
-            console.log(prompt)
             // since we are working with cy.within to generate the code
             // we should wrap the generated commands too
             const generated =
               '.within(() => {\n' +
               generatedCommands.join('\n') +
               '\n})'
-            console.log(generated)
 
             fetch('http://localhost:4321/save-generated-thought', {
               method: 'POST',
@@ -132,6 +130,29 @@ Cypress.Commands.add(
             })
           }
           controls.appendChild(saveButton)
+
+          const clearCacheButton = document.createElement('button')
+          clearCacheButton.innerText = '🗑️'
+          clearCacheButton.style.marginLeft = '4px'
+          clearCacheButton.title =
+            'Clear all generated thoughts cache for this test'
+          clearCacheButton.onclick = (e) => {
+            e.stopPropagation()
+            console.log('Clearing cache NOT IMPLEMENTED YET')
+
+            fetch('http://localhost:4321/clear-cached-thoughts', {
+              method: 'POST',
+              cors: 'cors',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                specFilename: Cypress.spec.relative,
+                testTitle: Cypress.currentTest.titlePath.join(' > '),
+              }),
+            })
+          }
+          controls.appendChild(clearCacheButton)
         })
 
       // always yield the original subject
