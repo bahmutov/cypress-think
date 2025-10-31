@@ -30,6 +30,19 @@ function removeStyleElements(html) {
 }
 
 /**
+ * Remove all <script> elements from HTML string
+ * @param {string} html - The HTML string to process
+ * @returns {string} HTML string without script elements
+ */
+function removeScriptElements(html) {
+  if (!html) {
+    return html
+  }
+  // Remove all <script>...</script> tags (including multi-line)
+  return html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+}
+
+/**
  * @param {string} str
  * @param {string} [algorithm]
  * @returns {Promise<string>} hex string of the hash
@@ -271,9 +284,10 @@ export default function cypressThinkPlugin(on, config, options = {}) {
       )
       logHtml(html)
 
-      // Remove all <style> elements before processing
+      // Remove all <style>, <script> elements before processing
       html = removeStyleElements(html)
-      log('Removed style elements from HTML')
+      html = removeScriptElements(html)
+      log('Removed style and script elements from HTML')
 
       const MAX_HTML_LENGTH = 10_000
       if (html.length > MAX_HTML_LENGTH) {

@@ -2,7 +2,7 @@ import ollama from 'ollama'
 
 const baseInstructions = `
 You are an expert Cypress.io test developer.
-You output only the Cypress test commands.
+You output only the Cypress test commands, no tests, no explanations, no comments.
 You start each response without any preamble and without previous context.
 Given the current HTML of a web page or its partial HTML snippet,
 and a prompt describing what to test on that page,
