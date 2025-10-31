@@ -2,21 +2,6 @@
 
 import OpenAI from 'openai'
 
-const openAiApiKey = process.env['OPEN_AI_API_KEY']
-if (!openAiApiKey) {
-  throw new Error('OPEN_AI_API_KEY environment variable is required')
-}
-const openAiBaseUrl =
-  process.env['OPEN_AI_BASE_URL'] || 'https://api.openai.com/v1'
-if (!openAiBaseUrl) {
-  throw new Error('OPEN_AI_BASE_URL environment variable is required')
-}
-
-const client = new OpenAI({
-  apiKey: openAiApiKey,
-  baseURL: openAiBaseUrl,
-})
-
 const baseInstructions = `
 You are an expert Cypress.io test developer.
 Given the current HTML of a web page or its partial HTML snippet,
@@ -35,6 +20,25 @@ export async function think({
   if (!model) {
     model = 'gpt-4.1'
   }
+
+  const openAiApiKey = process.env['OPEN_AI_API_KEY']
+  if (!openAiApiKey) {
+    throw new Error(
+      'OPEN_AI_API_KEY environment variable is required',
+    )
+  }
+  const openAiBaseUrl =
+    process.env['OPEN_AI_BASE_URL'] || 'https://api.openai.com/v1'
+  if (!openAiBaseUrl) {
+    throw new Error(
+      'OPEN_AI_BASE_URL environment variable is required',
+    )
+  }
+
+  const client = new OpenAI({
+    apiKey: openAiApiKey,
+    baseURL: openAiBaseUrl,
+  })
 
   // Combine base instructions with agent instructions if provided
   let instructions = baseInstructions
