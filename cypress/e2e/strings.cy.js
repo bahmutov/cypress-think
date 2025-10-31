@@ -1,3 +1,4 @@
+/// <reference path="../../src/index.d.ts" />
 // @ts-check
 
 it('supports an array of strings', () => {
