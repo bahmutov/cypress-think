@@ -7,8 +7,8 @@ it('enters text into input', () => {
     .think(`
       enter "Gleb Bah" into the username field
       enter "gleb@acme.co" into the email field
-      click on the submit button!
-
+      click checkbox "Remember me"
+      click on the button with text "Submit"
       confirm the username field contains "Gleb Bah"
     `)
 

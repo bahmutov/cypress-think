@@ -11,10 +11,16 @@ export default defineConfig({
     scrollBehavior: 'center',
     defaultCommandTimeout: 1000,
     setupNodeEvents(on, config) {
-      cypressThinkPlugin(on, config, {
+      const openAiOptions = {
         client: 'openai',
-        model: 'gpt-5-codex', // 'gpt-4',
-      })
+        model: 'gpt-5-codex',
+      }
+      const ollamaOptions = {
+        client: 'ollama',
+        model: 'codellama',
+      }
+
+      cypressThinkPlugin(on, config, openAiOptions)
     },
   },
 })

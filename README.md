@@ -1,6 +1,7 @@
 # <span style="color: red; font-size: 2em;">⚠️ Not ready to be used yet.</span>
 
 ---
+
 # cypress-think
 
 > Create Cypress tests using your own AI
@@ -14,7 +15,6 @@ Given `cy.think(...)` command, comes up with accurate Cypress commands line by l
 Produces the following test, see line by line generated commands
 
 ![Passing test](./images/think.png)
-
 
 ## Agent instructions
 
@@ -43,5 +43,16 @@ Save replaces the original `.think(prompt)` with the generated `.within(...)` co
 Here is before and after spec file
 
 ![Saving generated code](./images/save-generated-code.png)
+
+## Debugging
+
+This plugin uses [debug]() to output debug logs to STDERR.
+
+```bash
+# show debug logs: commands, results
+$ DEBUG=cypress-think npx cypress open
+# show HTML sent to the model (verbose)
+$ DEBUG=cypress-think:html npx cypress open
+```
 
 See [LICENSE.md](./LICENSE.md)

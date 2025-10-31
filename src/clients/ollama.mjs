@@ -44,32 +44,38 @@ ${agentInstructions}
     Do not prepend any comments or explanations.
   `
 
-  const response = await ollama.generate({
-    model: 'codellama',
-    prompt: input,
-    system: instructions,
-    stream: false,
-  })
-  console.log(response.response)
-  console.log('input tokens:', response.prompt_eval_count)
-  console.log('output tokens:', response.eval_count)
+  try {
+    const response = await ollama.generate({
+      model: 'codellama',
+      prompt: input,
+      system: instructions,
+      stream: false,
+    })
+    console.log(response.response)
+    console.log('input tokens:', response.prompt_eval_count)
+    console.log('output tokens:', response.eval_count)
 
-  let output = response.response.trim()
-  // Ollama models have a tendency to wrap code blocks in triple backticks
-  if (output.startsWith('```') && output.endsWith('```')) {
-    // remove triple backticks by removing the first and the last lines
-    output = output.split('\n').slice(1, -1).join('\n').trim()
-  }
-  console.error('model %s response:\n%s\n', model, output)
-  console.error('response usage:')
+    let output = response.response.trim()
+    // Ollama models have a tendency to wrap code blocks in triple backticks
+    if (output.startsWith('```') && output.endsWith('```')) {
+      // remove triple backticks by removing the first and the last lines
+      output = output.split('\n').slice(1, -1).join('\n').trim()
+    }
+    console.error('model %s response:\n%s\n', model, output)
+    console.error('response usage:')
 
-  const totalTokens = response.prompt_eval_count + response.eval_count
-  console.error('total tokens:', totalTokens)
+    const totalTokens =
+      response.prompt_eval_count + response.eval_count
+    console.error('total tokens:', totalTokens)
 
-  return {
-    command: output,
-    totalTokens: totalTokens,
-    client: 'ollama',
-    model,
+    return {
+      command: output,
+      totalTokens: totalTokens,
+      client: 'ollama',
+      model,
+    }
+  } catch (error) {
+    console.error('Error during Ollama API call:', error)
+    throw new Error(`Calling Ollama API failed: ${error.message}`)
   }
 }

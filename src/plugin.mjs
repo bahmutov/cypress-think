@@ -10,6 +10,7 @@ import { join } from 'path'
 import debug from 'debug'
 
 const log = debug('cypress-think')
+const logHtml = debug('cypress-think:html')
 
 /**
  * @param {string} str
@@ -251,8 +252,9 @@ export default function cypressThinkPlugin(on, config, options = {}) {
         'Start of HTML if any: %s',
         html ? html.slice(0, 100) : 'no html',
       )
+      logHtml(html)
 
-      const MAX_HTML_LENGTH = 10000
+      const MAX_HTML_LENGTH = 10_000
       if (html.length > MAX_HTML_LENGTH) {
         log(
           'HTML length is %d characters, truncating to %d',
@@ -260,6 +262,7 @@ export default function cypressThinkPlugin(on, config, options = {}) {
           MAX_HTML_LENGTH,
         )
         html = html.slice(0, MAX_HTML_LENGTH)
+        logHtml('Truncated HTML:\n%s', html)
       }
 
       const promptHash = await hashString(
