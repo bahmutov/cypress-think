@@ -62,6 +62,11 @@ ${agentInstructions}
       // remove triple backticks by removing the first and the last lines
       output = output.split('\n').slice(1, -1).join('\n').trim()
     }
+    // single line code block
+    if (output.startsWith('`') && output.endsWith('`')) {
+      output = output.slice(1, -1).trim()
+    }
+
     console.error('model %s response:\n%s\n', model, output)
     console.error('response usage:')
 
