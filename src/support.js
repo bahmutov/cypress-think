@@ -33,6 +33,8 @@ Cypress.Commands.add(
       .map((line) => line.trim())
       // remove empty lines
       .filter(Boolean)
+      // remove comment lines starting with //
+      .filter((line) => !line.startsWith('//'))
 
     const processPromptLines = () => {
       lines.forEach(async (line, k) => {

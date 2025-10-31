@@ -16,6 +16,24 @@ Produces the following test, see line by line generated commands
 
 ![Passing test](./images/think.png)
 
+## Input prompt
+
+Can be a single line, multi-line literal, or an array of strings
+
+```js
+cy.think('Visit the site')
+cy.think(`
+  visit the site
+  // comments are ignored
+  click on the "Sign in" button
+`)
+cy.think([
+  'visit the site',
+  'click on the "Home" thumbnail',
+  'url should include "/home"',
+])
+```
+
 ## Agent instructions
 
 This package automatically discovers your agent instructions and includes them with your prompts, see [agent-instructions.mjs](./src/agent-instructions.mjs)

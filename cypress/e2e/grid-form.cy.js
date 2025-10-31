@@ -7,7 +7,7 @@ it('fills the grid form', () => {
   cy.contains('nb-card', 'Using the Grid').think(`
     enter "gleb@acme.co" into the email field
     enter "${password}" into the password field
-    click "Option 2" text
+    // click "Option 2" text
     confirm the "Sign in" button is enabled
   `)
 })
