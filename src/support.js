@@ -38,40 +38,42 @@ Cypress.Commands.add(
 
     const processPromptLines = () => {
       lines.forEach(async (line, k) => {
-        cy.log(`**step ${k + 1}: ${line}**`)
+        cy.log(`**step ${k + 1}: ${line}**`).then(() => {
+          // current html - either the entire page (body) or the subject element
+          const html =
+            subject?.html() || cy.state('document')?.body?.outerHTML
+          cy.task(
+            'cypress:think',
+            {
+              prompt: line,
+              html,
+              specFilename: Cypress.spec.relative,
+              testTitle: Cypress.currentTest.titlePath.join(' > '),
+            },
+            { log: false },
+          ).then(
+            ({ command, totalTokens, fromCache, client, model }) => {
+              lastCommand = { client, model }
+              if (fromCache) {
+                cy.log(
+                  `🤖⚡️ ${command} (${totalTokens} tokens saved)`,
+                )
+              } else {
+                cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
+              }
+              // execute the command
+              // eslint-disable-next-line no-eval
+              eval(command)
 
-        // current html - either the entire page (body) or the subject element
-        const html =
-          subject?.html() || cy.state('document')?.body?.outerHTML
-        cy.task(
-          'cypress:think',
-          {
-            prompt: line,
-            html,
-            specFilename: Cypress.spec.relative,
-            testTitle: Cypress.currentTest.titlePath.join(' > '),
-          },
-          { log: false },
-        ).then(
-          ({ command, totalTokens, fromCache, client, model }) => {
-            lastCommand = { client, model }
-            if (fromCache) {
-              cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
-            } else {
-              cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
-            }
-            // execute the command
-            // eslint-disable-next-line no-eval
-            eval(command)
-
-            cy.then(() => {
-              // the command has succeeded
-              // add the original line as the comment for clarity
-              generatedCommands.push(`// ${line}`)
-              generatedCommands.push(command)
-            })
-          },
-        )
+              cy.then(() => {
+                // the command has succeeded
+                // add the original line as the comment for clarity
+                generatedCommands.push(`// ${line}`)
+                generatedCommands.push(command)
+              })
+            },
+          )
+        })
       })
     }
 
