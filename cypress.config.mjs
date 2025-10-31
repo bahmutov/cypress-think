@@ -20,7 +20,7 @@ export default defineConfig({
         model: 'codellama',
       }
 
-      cypressThinkPlugin(on, config, openAiOptions)
+      cypressThinkPlugin(on, config, ollamaOptions)
     },
   },
 })
