@@ -101,6 +101,11 @@ Cypress.Commands.add(
             return
           }
 
+          // grab the current spec filename and test title
+          // before the test switches to something like a hook
+          const specFilename = Cypress.spec.relative
+          const testTitle = Cypress.currentTest.titlePath.join(' > ')
+
           const saveButton = document.createElement('button')
           saveButton.innerText = '💾'
           saveButton.title = 'Replace prompt with the generated code'
@@ -120,8 +125,8 @@ Cypress.Commands.add(
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                specFilename: Cypress.spec.relative,
-                testTitle: Cypress.currentTest.titlePath.join(' > '),
+                specFilename,
+                testTitle,
                 prompt,
                 generatedCode: generated,
               }),
@@ -141,9 +146,6 @@ Cypress.Commands.add(
           controls.appendChild(saveButton)
 
           const clearCacheButton = document.createElement('button')
-          const specFilename = Cypress.spec.relative
-          const testTitle = Cypress.currentTest.titlePath.join(' > ')
-
           clearCacheButton.innerText = '🗑️'
           clearCacheButton.style.marginLeft = '4px'
           clearCacheButton.title =
