@@ -13,6 +13,23 @@ const log = debug('cypress-think')
 const logHtml = debug('cypress-think:html')
 
 /**
+ * Remove all <style> elements from HTML string
+ * @param {string} html - The HTML string to process
+ * @returns {string} HTML string without style elements
+ */
+function removeStyleElements(html) {
+  if (!html) {
+    return html
+  }
+  // Remove all <style>...</style> tags (including multi-line)
+  // This regex handles:
+  // - <style> with or without attributes
+  // - Content spanning multiple lines
+  // - Multiple style elements
+  return html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+}
+
+/**
  * @param {string} str
  * @param {string} [algorithm]
  * @returns {Promise<string>} hex string of the hash
@@ -253,6 +270,10 @@ export default function cypressThinkPlugin(on, config, options = {}) {
         html ? html.slice(0, 100) : 'no html',
       )
       logHtml(html)
+
+      // Remove all <style> elements before processing
+      html = removeStyleElements(html)
+      log('Removed style elements from HTML')
 
       const MAX_HTML_LENGTH = 10_000
       if (html.length > MAX_HTML_LENGTH) {
