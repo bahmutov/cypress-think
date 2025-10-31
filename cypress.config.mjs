@@ -13,7 +13,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       cypressThinkPlugin(on, config, {
         client: 'openai',
-        model: 'gpt-4',
+        model: 'gpt-5-codex', // 'gpt-4',
       })
     },
   },

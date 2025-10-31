@@ -141,13 +141,15 @@ Cypress.Commands.add(
           controls.appendChild(saveButton)
 
           const clearCacheButton = document.createElement('button')
+          const specFilename = Cypress.spec.relative
+          const testTitle = Cypress.currentTest.titlePath.join(' > ')
+
           clearCacheButton.innerText = '🗑️'
           clearCacheButton.style.marginLeft = '4px'
           clearCacheButton.title =
             'Clear all generated thoughts cache for this test'
           clearCacheButton.onclick = (e) => {
             e.stopPropagation()
-            console.log('Clearing cache NOT IMPLEMENTED YET')
 
             fetch('http://localhost:4321/clear-cached-thoughts', {
               method: 'POST',
@@ -156,8 +158,8 @@ Cypress.Commands.add(
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                specFilename: Cypress.spec.relative,
-                testTitle: Cypress.currentTest.titlePath.join(' > '),
+                specFilename,
+                testTitle,
               }),
             })
           }

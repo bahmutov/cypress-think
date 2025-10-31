@@ -204,6 +204,8 @@ server.post('/clear-cached-thoughts', async (req, res) => {
     specFilename,
     testTitle,
   )
+
+  let deletedCount = 0
   Object.entries(promptCache).forEach(([hash, entry]) => {
     if (
       entry.specFilename === specFilename &&
@@ -211,9 +213,13 @@ server.post('/clear-cached-thoughts', async (req, res) => {
     ) {
       delete promptCache[hash]
       console.log('Deleted cached thought with hash:', hash)
+      deletedCount += 1
     }
   })
-  await savePromptCache()
+  if (deletedCount) {
+    await savePromptCache()
+  }
+  console.log('Total deleted cached thoughts:', deletedCount)
 
   res
     .headers({

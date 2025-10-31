@@ -1,3 +1,4 @@
+/// <reference path="../../src/index.d.ts" />
 // @ts-check
 
 it('picks the 20th of the current month', () => {
