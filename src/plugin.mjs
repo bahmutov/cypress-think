@@ -112,64 +112,56 @@ server.post('/save-generated-thought', async (req, res) => {
 
         // Avoid re-processing if we already added generated code for this prompt
         const alreadyGeneratedMarker = `// cy.think generated code for test: ${testTitle}`
-        if (originalSource.includes(alreadyGeneratedMarker)) {
-          console.log(
-            'Spec file already contains generated code marker, skipping update',
+
+        // Build regex to locate the .think(...) invocation containing the prompt.
+        // We support backticks and single quotes.
+        // Capture from ".think(" up to the closing parenthesis and semicolon/newline.
+        const escapedPrompt = prompt.replace(
+          /[.*+?^${}()|[\]\\]/g,
+          '\\$&',
+        ) // escape for regex
+        const thinkPatterns = [
+          new RegExp(
+            '\\.think\\(\\s*`' + escapedPrompt + '`\\s*\\)',
+            's',
+          ),
+          new RegExp(`\\.think\\(\\s*'${escapedPrompt}'\\s*\\)`, 's'),
+          new RegExp(
+            `\\.think\\(\\s*\"${escapedPrompt}\"\\s*\\)`,
+            's',
+          ),
+        ]
+        let matchInfo = null
+        for (const re of thinkPatterns) {
+          const m = originalSource.match(re)
+          if (m) {
+            matchInfo = { match: m[0], index: m.index }
+            break
+          }
+        }
+
+        if (!matchInfo) {
+          console.warn(
+            'Could not find .think(...) call with provided prompt in spec file',
           )
         } else {
-          // Build regex to locate the .think(...) invocation containing the prompt.
-          // We support backticks and single quotes.
-          // Capture from ".think(" up to the closing parenthesis and semicolon/newline.
-          const escapedPrompt = prompt.replace(
-            /[.*+?^${}()|[\]\\]/g,
-            '\\$&',
-          ) // escape for regex
-          const thinkPatterns = [
-            new RegExp(
-              '\\.think\\(\\s*`' + escapedPrompt + '`\\s*\\)',
-              's',
-            ),
-            new RegExp(
-              `\\.think\\(\\s*'${escapedPrompt}'\\s*\\)`,
-              's',
-            ),
-            new RegExp(
-              `\\.think\\(\\s*\"${escapedPrompt}\"\\s*\\)`,
-              's',
-            ),
-          ]
-          let matchInfo = null
-          for (const re of thinkPatterns) {
-            const m = originalSource.match(re)
-            if (m) {
-              matchInfo = { match: m[0], index: m.index }
-              break
-            }
-          }
+          const { match, index } = matchInfo
+          // Determine the full range to comment out. We will comment line by line.
+          // Extend to end of line after the match for clarity.
+          const endIndex = index + match.length
+          // Split source into lines to apply comments precisely
+          const before = originalSource.slice(0, index)
+          const after = originalSource.slice(endIndex)
+          // Delete the original .think(...) call entirely instead of commenting it out
+          // Avoid adding a leading blank line before the generated code block
+          const insertionBlock = `${alreadyGeneratedMarker}\n${generatedCode}\n// end cy.think generated code`
+          const newSource = before + insertionBlock + after
 
-          if (!matchInfo) {
-            console.warn(
-              'Could not find .think(...) call with provided prompt in spec file',
-            )
-          } else {
-            const { match, index } = matchInfo
-            // Determine the full range to comment out. We will comment line by line.
-            // Extend to end of line after the match for clarity.
-            const endIndex = index + match.length
-            // Split source into lines to apply comments precisely
-            const before = originalSource.slice(0, index)
-            const after = originalSource.slice(endIndex)
-            // Delete the original .think(...) call entirely instead of commenting it out
-            // Avoid adding a leading blank line before the generated code block
-            const insertionBlock = `${alreadyGeneratedMarker}\n${generatedCode}\n// end cy.think generated code`
-            const newSource = before + insertionBlock + after
-
-            fs.writeFileSync(absoluteSpecPath, newSource, 'utf8')
-            console.log(
-              'Updated spec file with generated code:',
-              absoluteSpecPath,
-            )
-          }
+          fs.writeFileSync(absoluteSpecPath, newSource, 'utf8')
+          console.log(
+            'Updated spec file with generated code:',
+            absoluteSpecPath,
+          )
         }
       }
     }
