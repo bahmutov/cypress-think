@@ -1,5 +1,7 @@
 /// <reference path="./index.d.ts" />
 
+const buttonClasses = `border border-solid rounded rounded-[4px] flex cy-button-width font-medium items-center transition duration-150 hover:shadow-ring-hover focus:shadow-ring-focus active:shadow-ring-focus disabled:hover:shadow-none disabled:cursor-not-allowed focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:outline-none text-white border-white/20 hocus:border-white/60 disabled:hocus:shadow-none hocus:shadow-white/20 disabled:text-gray-700 disabled:hocus:border-white/20 disabled:border-white/20 focus:ring-gray-200 text-[14px] leading-[18px] min-h-[20px] px-[8px] py-[4px]`
+
 Cypress.Commands.add(
   'think',
   {
@@ -109,6 +111,7 @@ Cypress.Commands.add(
           const saveButton = document.createElement('button')
           saveButton.innerText = '💾'
           saveButton.title = 'Replace prompt with the generated code'
+          saveButton.className = buttonClasses
           saveButton.onclick = (e) => {
             e.stopPropagation()
             // since we are working with cy.within to generate the code
@@ -132,8 +135,8 @@ Cypress.Commands.add(
               }),
             }).then((response) => {
               if (response.ok) {
-                saveButton.disabled = true
-                saveButton.innerText = '✅'
+                // remove the button completely
+                controls.removeChild(saveButton)
               } else {
                 console.error(
                   'Failed to save generated code',
@@ -147,7 +150,7 @@ Cypress.Commands.add(
 
           const clearCacheButton = document.createElement('button')
           clearCacheButton.innerText = '🗑️'
-          clearCacheButton.style.marginLeft = '4px'
+          clearCacheButton.className = buttonClasses
           clearCacheButton.title =
             'Clear all generated thoughts cache for this test'
           clearCacheButton.onclick = (e) => {
@@ -163,6 +166,17 @@ Cypress.Commands.add(
                 specFilename,
                 testTitle,
               }),
+            }).then((response) => {
+              if (response.ok) {
+                // remove the button completely
+                controls.removeChild(clearCacheButton)
+              } else {
+                console.error(
+                  'Failed to clear the test generated code cache',
+                  response.statusText,
+                )
+                clearCacheButton.innerText = '❌'
+              }
             })
           }
           controls.appendChild(clearCacheButton)
