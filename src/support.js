@@ -7,7 +7,7 @@ Cypress.Commands.add(
   {
     prevSubject: 'optional',
   },
-  (subject, prompt) => {
+  (subject, prompt, options) => {
     if (subject && !Cypress.dom.isJquery(subject)) {
       throw new Error(
         'The think command can only be called on a DOM element or without a subject',
@@ -16,6 +16,8 @@ Cypress.Commands.add(
     if (!prompt) {
       throw new Error('A prompt is required for the think command')
     }
+
+    const placeholders = options?.placeholders || {}
 
     const logProps = {
       name: 'think',
@@ -61,6 +63,16 @@ Cypress.Commands.add(
               } else {
                 cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
               }
+
+              // replace placeholders in the command
+              Object.entries(placeholders).forEach(([key, value]) => {
+                const placeholderPattern = new RegExp(
+                  `{{\\s*${key}\\s*}}`,
+                  'g',
+                )
+                command = command.replace(placeholderPattern, value)
+              })
+
               // execute the command
               // eslint-disable-next-line no-eval
               eval(command)

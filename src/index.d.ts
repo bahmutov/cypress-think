@@ -6,6 +6,10 @@
 
 declare global {
   namespace Cypress {
+    interface ThinkOptions {
+      placeholders?: Record<string, string>
+    }
+
     interface Chainable<Subject = any> {
       /**
        * Takes the given prompt string
@@ -30,7 +34,10 @@ declare global {
        *   click on the submit button
        * `)
        */
-      think(prompt: string): Chainable<Subject>
+      think(
+        prompt: string,
+        options?: ThinkOptions,
+      ): Chainable<Subject>
 
       /**
        * Takes an array of prompt strings
@@ -46,7 +53,10 @@ declare global {
        *   `click on the submit button`,
        * ])
        */
-      think(prompts: string[]): Chainable<Subject>
+      think(
+        prompts: string[],
+        options?: ThinkOptions,
+      ): Chainable<Subject>
     }
   }
 }

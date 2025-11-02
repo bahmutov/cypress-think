@@ -62,6 +62,24 @@ Here is before and after spec file
 
 ![Saving generated code](./images/save-generated-code.png)
 
+## Placeholders
+
+You can use dynamic values, while the AI query stays unchanged via `placeholders` option
+
+```js
+const name = 'Ann Marie'
+cy.think(
+  'enter {{name}} into the input with placeholder "Enter name"',
+  {
+    placeholders: { name },
+  },
+)
+```
+
+The AI query is going to be `enter {{name}} into...`, while the actual command will enter "Ann Marie"
+
+![Placeholders test](./images/placeholders.png)
+
 ## Debugging
 
 This plugin uses [debug]() to output debug logs to STDERR.
