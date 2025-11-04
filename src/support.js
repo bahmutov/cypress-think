@@ -2,6 +2,31 @@
 
 const buttonClasses = `border border-solid rounded rounded-[4px] flex cy-button-width font-medium items-center transition duration-150 hover:shadow-ring-hover focus:shadow-ring-focus active:shadow-ring-focus disabled:hover:shadow-none disabled:cursor-not-allowed focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:outline-none text-white border-white/20 hocus:border-white/60 disabled:hocus:shadow-none hocus:shadow-white/20 disabled:text-gray-700 disabled:hocus:border-white/20 disabled:border-white/20 focus:ring-gray-200 text-[14px] leading-[18px] min-h-[20px] px-[8px] py-[4px]`
 
+function findBadSelectors(command) {
+  // refine the selectors to make sure they make sense
+  // find all possible selectors in this command
+  // consider the top level cy.get, find, contains commands
+  const badSelectors = []
+  const selectorPattern =
+    /cy\.(get|find|contains)\(\s*(['"`])(.*?)\2\s*\)/g
+  let match
+  while ((match = selectorPattern.exec(command)) !== null) {
+    const fullMatch = match[0]
+    const selector = match[3]
+    console.log('Checking selector:', selector)
+    // check if there are any elements matching this selector
+    try {
+      const elements = Cypress.$(selector)
+      if (elements.length === 0) {
+        badSelectors.push(selector)
+      }
+    } catch {
+      // do nothing
+    }
+  }
+  return badSelectors
+}
+
 Cypress.Commands.add(
   'think',
   {
@@ -41,6 +66,41 @@ Cypress.Commands.add(
     const processPromptLines = () => {
       lines.forEach(async (line, k) => {
         cy.log(`**step ${k + 1}: ${line}**`).then(() => {
+          const executeAiCommand = ({
+            command,
+            totalTokens,
+            fromCache,
+            client,
+            model,
+          }) => {
+            lastCommand = { client, model }
+            if (fromCache) {
+              cy.log(`🤖⚡️ ${command} (${totalTokens} tokens saved)`)
+            } else {
+              cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
+            }
+
+            // replace placeholders in the command
+            Object.entries(placeholders).forEach(([key, value]) => {
+              const placeholderPattern = new RegExp(
+                `{{\\s*${key}\\s*}}`,
+                'g',
+              )
+              command = command.replace(placeholderPattern, value)
+            })
+
+            // execute the command
+            // eslint-disable-next-line no-eval
+            eval(command)
+
+            cy.then(() => {
+              // the command has succeeded
+              // add the original line as the comment for clarity
+              generatedCommands.push(`// ${line}`)
+              generatedCommands.push(command)
+            })
+          }
+
           // current html - either the entire page (body) or the subject element
           const html =
             subject?.html() || cy.state('document')?.body?.outerHTML
@@ -55,34 +115,71 @@ Cypress.Commands.add(
             { log: false },
           ).then(
             ({ command, totalTokens, fromCache, client, model }) => {
-              lastCommand = { client, model }
-              if (fromCache) {
-                cy.log(
-                  `🤖⚡️ ${command} (${totalTokens} tokens saved)`,
-                )
+              const badSelectors = findBadSelectors(command)
+
+              if (badSelectors.length === 0) {
+                executeAiCommand({
+                  command,
+                  totalTokens,
+                  fromCache,
+                  client,
+                  model,
+                })
               } else {
-                cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
-              }
+                cy.log('🤖 Refining the prompt to fix selectors...')
+                const updatedPrompt =
+                  line +
+                  `\nDO NOT USE THE FOLLOWING SELECTORS: ${badSelectors.map((selector) => `\`${selector}\``).join(', ')}`
+                cy.task(
+                  'cypress:think',
+                  {
+                    prompt: updatedPrompt,
+                    html,
+                    specFilename: Cypress.spec.relative,
+                    testTitle:
+                      Cypress.currentTest.titlePath.join(' > '),
+                  },
+                  { log: false },
+                ).then(
+                  ({
+                    command,
+                    totalTokens,
+                    fromCache,
+                    client,
+                    model,
+                  }) => {
+                    const badSelectors = findBadSelectors(command)
 
-              // replace placeholders in the command
-              Object.entries(placeholders).forEach(([key, value]) => {
-                const placeholderPattern = new RegExp(
-                  `{{\\s*${key}\\s*}}`,
-                  'g',
+                    if (badSelectors.length === 0) {
+                      executeAiCommand({
+                        command,
+                        totalTokens,
+                        fromCache,
+                        client,
+                        model,
+                      })
+                    } else {
+                      cy.log(
+                        '🤖 Refining the prompt to fix selectors...',
+                      )
+                      const updatedPrompt =
+                        line +
+                        ` the following selectors fail: ${badSelectors.join(', ')}, find alternatives`
+                      cy.task(
+                        'cypress:think',
+                        {
+                          prompt: updatedPrompt,
+                          html,
+                          specFilename: Cypress.spec.relative,
+                          testTitle:
+                            Cypress.currentTest.titlePath.join(' > '),
+                        },
+                        { log: false },
+                      ).then(executeAiCommand)
+                    }
+                  },
                 )
-                command = command.replace(placeholderPattern, value)
-              })
-
-              // execute the command
-              // eslint-disable-next-line no-eval
-              eval(command)
-
-              cy.then(() => {
-                // the command has succeeded
-                // add the original line as the comment for clarity
-                generatedCommands.push(`// ${line}`)
-                generatedCommands.push(command)
-              })
+              }
             },
           )
         })
