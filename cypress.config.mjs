@@ -6,6 +6,7 @@ export default defineConfig({
   defaultBrowser: 'electron',
   e2e: {
     // baseUrl, etc
+    experimentalPromptCommand: true,
     baseUrl: 'https://playground.bondaracademy.com/',
     fixturesFolder: false,
     scrollBehavior: 'center',

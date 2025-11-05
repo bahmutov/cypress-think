@@ -64,6 +64,15 @@ const CACHE_FILE_PATH = join(process.cwd(), 'thoughts.json')
 
 // Load promptCache from file if it exists
 let promptCache = {}
+
+/**
+ * We do not save the generated command right away,
+ * we first send it to the browser, and only if it
+ * succeeds, we save it to the cache.
+ * This object holds prompts waiting to be cached.
+ */
+const waitingToCachePrompts = {}
+
 async function loadPromptCache() {
   if (existsSync(CACHE_FILE_PATH)) {
     try {
@@ -253,6 +262,25 @@ server.post('/clear-cached-thoughts', async (req, res) => {
     .send({ success: true })
 })
 
+server.post('/save-prompt', async (req, res) => {
+  const { promptHash } = req.body
+
+  console.log('Saving successful prompt hash "%s"', promptHash)
+  if (promptHash in waitingToCachePrompts) {
+    const entry = waitingToCachePrompts[promptHash]
+    promptCache[promptHash] = entry
+    delete waitingToCachePrompts[promptHash]
+    await savePromptCache()
+  } else {
+    console.warn(
+      'No prompt found waiting to be cached for hash:',
+      promptHash,
+    )
+  }
+
+  res.status(200).send({ success: true })
+})
+
 server.listen({ port: 4321 }).then(() => {
   console.log('cy.think server listening on port 4321')
 })
@@ -324,19 +352,25 @@ export default function cypressThinkPlugin(on, config, options = {}) {
         html,
         agentInstructions,
       })
-      promptCache[promptHash] = {
+
+      // do not save the command just yet
+      // wait until we know it is successful in the browser
+      log('storing prompt to be cached later, hash %s', promptHash)
+      waitingToCachePrompts[promptHash] = {
         prompt,
         ...result,
         specFilename,
         testTitle,
       }
-      await savePromptCache()
+      // await savePromptCache()
+
       return {
         command: result.command,
         totalTokens: result.totalTokens,
         fromCache: false,
         client: result.client,
         model: result.model,
+        promptHash,
       }
     },
   })

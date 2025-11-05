@@ -29,7 +29,7 @@
     "openai": "^6.7.0"
   },
   "devDependencies": {
-    "cypress": "^15.5.0",
+    "cypress": "^15.6.0",
     "prettier": "^3.6.2",
     "semantic-release": "^25.0.1"
   },

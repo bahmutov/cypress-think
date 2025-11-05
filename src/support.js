@@ -54,8 +54,14 @@ Cypress.Commands.add(
             },
             { log: false },
           ).then(
-            ({ command, totalTokens, fromCache, client, model }) => {
-              lastCommand = { client, model }
+            ({
+              command,
+              totalTokens,
+              fromCache,
+              client,
+              model,
+              promptHash,
+            }) => {
               if (fromCache) {
                 cy.log(
                   `🤖⚡️ ${command} (${totalTokens} tokens saved)`,
@@ -73,16 +79,39 @@ Cypress.Commands.add(
                 command = command.replace(placeholderPattern, value)
               })
 
-              // execute the command
-              // eslint-disable-next-line no-eval
-              eval(command)
+              try {
+                // execute the command
+                // eslint-disable-next-line no-eval
+                eval(command)
 
-              cy.then(() => {
-                // the command has succeeded
-                // add the original line as the comment for clarity
-                generatedCommands.push(`// ${line}`)
-                generatedCommands.push(command)
-              })
+                lastCommand = { client, model }
+
+                cy.then(() => {
+                  // the command has succeeded
+                  // add the original line as the comment for clarity
+                  generatedCommands.push(`// ${line}`)
+                  generatedCommands.push(command)
+                })
+
+                if (!fromCache) {
+                  // this command was just generated
+                  // we need to let the backend know to save it
+                  cy.request({
+                    method: 'POST',
+                    url: 'http://localhost:4321/save-prompt',
+                    body: {
+                      promptHash,
+                    },
+                    // do not pollute the command log
+                    // with these utility messages
+                    log: false,
+                  })
+                }
+              } catch (err) {
+                throw new Error(
+                  `Failed to execute generated command: ${command}\nError: ${err.message}`,
+                )
+              }
             },
           )
         })
