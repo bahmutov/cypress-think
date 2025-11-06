@@ -51,7 +51,7 @@ Cypress.Commands.add(
 
             fetch('http://localhost:4321/clear-cached-thoughts', {
               method: 'POST',
-              cors: 'cors',
+              mode: 'cors',
               headers: {
                 'Content-Type': 'application/json',
               },
@@ -220,7 +220,7 @@ Cypress.Commands.add(
 
             fetch('http://localhost:4321/save-generated-thought', {
               method: 'POST',
-              cors: 'cors',
+              mode: 'cors',
               headers: {
                 'Content-Type': 'application/json',
               },
