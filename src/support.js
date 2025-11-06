@@ -25,6 +25,58 @@ Cypress.Commands.add(
     }
     Cypress.log(logProps)
 
+    // Add clear cache button to the "thinking..." log message
+    cy.wait(100, { log: false }).then(() => {
+      // get the very last command element in the Cypress Command Log
+      const logElements = window.top.document.querySelectorAll(
+        '.command.command-name-think',
+      )
+      const lastLogElement = logElements[logElements.length - 1]
+      if (lastLogElement) {
+        const controls = lastLogElement.querySelector(
+          '.command-controls',
+        )
+        if (controls) {
+          // grab the current spec filename and test title
+          const specFilename = Cypress.spec.relative
+          const testTitle = Cypress.currentTest.titlePath.join(' > ')
+
+          const clearCacheButton = document.createElement('button')
+          clearCacheButton.innerText = '🗑️'
+          clearCacheButton.className = buttonClasses
+          clearCacheButton.title =
+            'Clear all generated thoughts cache for this test'
+          clearCacheButton.onclick = (e) => {
+            e.stopPropagation()
+
+            fetch('http://localhost:4321/clear-cached-thoughts', {
+              method: 'POST',
+              cors: 'cors',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                specFilename,
+                testTitle,
+              }),
+            }).then((response) => {
+              if (response.ok) {
+                // remove the button completely
+                controls.removeChild(clearCacheButton)
+              } else {
+                console.error(
+                  'Failed to clear the test generated code cache',
+                  response.statusText,
+                )
+                clearCacheButton.innerText = '❌'
+              }
+            })
+          }
+          controls.appendChild(clearCacheButton)
+        }
+      }
+    })
+
     const generatedCommands = []
     let lastCommand = null
 
@@ -192,39 +244,6 @@ Cypress.Commands.add(
             })
           }
           controls.appendChild(saveButton)
-
-          const clearCacheButton = document.createElement('button')
-          clearCacheButton.innerText = '🗑️'
-          clearCacheButton.className = buttonClasses
-          clearCacheButton.title =
-            'Clear all generated thoughts cache for this test'
-          clearCacheButton.onclick = (e) => {
-            e.stopPropagation()
-
-            fetch('http://localhost:4321/clear-cached-thoughts', {
-              method: 'POST',
-              cors: 'cors',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                specFilename,
-                testTitle,
-              }),
-            }).then((response) => {
-              if (response.ok) {
-                // remove the button completely
-                controls.removeChild(clearCacheButton)
-              } else {
-                console.error(
-                  'Failed to clear the test generated code cache',
-                  response.statusText,
-                )
-                clearCacheButton.innerText = '❌'
-              }
-            })
-          }
-          controls.appendChild(clearCacheButton)
         })
 
       // always yield the original subject
