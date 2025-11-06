@@ -248,6 +248,16 @@ server.post('/clear-cached-thoughts', async (req, res) => {
       deletedCount += 1
     }
   })
+  // delete any potential waiting to cache prompts as well
+  Object.entries(waitingToCachePrompts).forEach(([hash, entry]) => {
+    if (
+      entry.specFilename === specFilename &&
+      entry.testTitle === testTitle
+    ) {
+      delete waitingToCachePrompts[hash]
+    }
+  })
+
   if (deletedCount) {
     await savePromptCache()
   }
