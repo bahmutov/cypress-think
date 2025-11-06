@@ -49,6 +49,19 @@ Cypress.Commands.add(
           clearCacheButton.onclick = (e) => {
             e.stopPropagation()
 
+            // find the data-testid "save-prompt" button and remove it too
+            const savePromptButtons =
+              window.top.document.querySelectorAll(
+                'button[data-testid="save-prompt"]',
+              )
+            Array.from(savePromptButtons).forEach(
+              (savePromptButton) => {
+                savePromptButton.parentElement.removeChild(
+                  savePromptButton,
+                )
+              },
+            )
+
             fetch('http://localhost:4321/clear-cached-thoughts', {
               method: 'POST',
               mode: 'cors',
@@ -209,6 +222,7 @@ Cypress.Commands.add(
           saveButton.innerText = '💾'
           saveButton.title = 'Replace prompt with the generated code'
           saveButton.className = buttonClasses
+          saveButton.setAttribute('data-testid', 'save-prompt')
           saveButton.onclick = (e) => {
             e.stopPropagation()
             // since we are working with cy.within to generate the code
