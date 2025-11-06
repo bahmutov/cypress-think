@@ -11,12 +11,10 @@ that best matches the prompt and HTML.
 output only the Cypress command without any explanations or additional text.
 `
 
-export async function think({
-  model,
-  prompt,
-  html,
-  agentInstructions = null,
-}) {
+export async function think(
+  { model, prompt, html, agentInstructions = null },
+  aiOptions = {},
+) {
   if (!model) {
     model = 'gpt-4.1'
   }
@@ -62,6 +60,7 @@ ${agentInstructions}
     model,
     instructions,
     input,
+    ...aiOptions,
   })
 
   const output = response.output_text.trim()

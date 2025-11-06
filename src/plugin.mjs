@@ -285,7 +285,12 @@ server.listen({ port: 4321 }).then(() => {
   console.log('cy.think server listening on port 4321')
 })
 
-export default function cypressThinkPlugin(on, config, options = {}) {
+export default function cypressThinkPlugin(
+  on,
+  config,
+  options = {},
+  aiOptions = {},
+) {
   const client = options.client || 'openai' // or 'ollama'
 
   let think = null
@@ -346,12 +351,15 @@ export default function cypressThinkPlugin(on, config, options = {}) {
           model: cached.model,
         }
       }
-      const result = await think({
-        model,
-        prompt,
-        html,
-        agentInstructions,
-      })
+      const result = await think(
+        {
+          model,
+          prompt,
+          html,
+          agentInstructions,
+        },
+        aiOptions,
+      )
 
       // do not save the command just yet
       // wait until we know it is successful in the browser

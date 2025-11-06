@@ -20,8 +20,11 @@ export default defineConfig({
         client: 'ollama',
         model: 'codellama',
       }
+      const aiOptions = {
+        temperature: 0.1,
+      }
 
-      cypressThinkPlugin(on, config, ollamaOptions)
+      cypressThinkPlugin(on, config, ollamaOptions, aiOptions)
     },
   },
 })

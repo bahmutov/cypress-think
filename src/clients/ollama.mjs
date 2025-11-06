@@ -14,12 +14,10 @@ Do not prepend any comments or explanations.
 Follow the HTML structure to find the best selectors.
 `
 
-export async function think({
-  model,
-  prompt,
-  html,
-  agentInstructions = null,
-}) {
+export async function think(
+  { model, prompt, html, agentInstructions = null },
+  aiOptions = {},
+) {
   if (!model) {
     model = 'codellama'
   }
@@ -51,6 +49,7 @@ ${agentInstructions}
       prompt: input,
       system: instructions,
       stream: false,
+      options: aiOptions,
     })
     console.log(response.response)
     console.log('input tokens:', response.prompt_eval_count)
