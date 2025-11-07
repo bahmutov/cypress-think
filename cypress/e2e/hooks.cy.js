@@ -7,7 +7,7 @@ describe('Hooks', { baseUrl: null }, () => {
   })
 
   it('has h1', () => {
-    cy.get('h1').think('the text should be "Hello"')
+    cy.get('h1').think('the root element text should be "Hello"')
   })
 
   afterEach(() => {
