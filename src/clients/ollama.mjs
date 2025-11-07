@@ -58,6 +58,7 @@ ${agentInstructions}
     console.log(response.response)
     console.log('input tokens:', response.prompt_eval_count)
     console.log('output tokens:', response.eval_count)
+    console.log('duration ms:', durationMs)
 
     let output = response.response.trim()
     // Ollama models have a tendency to wrap code blocks in triple backticks

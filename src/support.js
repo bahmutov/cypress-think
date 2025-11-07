@@ -49,11 +49,25 @@ Cypress.Commands.add(
 
     const placeholders = options?.placeholders || {}
 
+    // the sum of generation durations for all new commands
+    let totalDurationMs = 0
+
     const logProps = {
       name: 'think',
       message: '**thinking...**',
+      type: 'parent',
+      consoleProps() {
+        const obj = {
+          Prompt: prompt,
+        }
+        if (totalDurationMs) {
+          obj['Total Duration'] =
+            humanizeDuration(totalDurationMs) || ''
+        }
+        return obj
+      },
     }
-    Cypress.log(logProps)
+    const _log = Cypress.log(logProps)
 
     // Add clear cache button to the "thinking..." log message
     cy.wait(100, { log: false }).then(() => {
@@ -163,6 +177,7 @@ Cypress.Commands.add(
                   `🤖⚡️ ${command} (${totalTokens} tokens saved)`,
                 )
               } else {
+                totalDurationMs += durationMs
                 const timing = humanizeDuration(durationMs)
                 const timingStr = timing ? ` in ${timing}` : ''
                 cy.log(
@@ -221,7 +236,9 @@ Cypress.Commands.add(
     const finishThinking = () => {
       let message = '**thinking accomplished**'
       if (lastCommand && lastCommand.client && lastCommand.model) {
-        message = `**thinking accomplished** (${lastCommand.client} ${lastCommand.model})`
+        const timing = humanizeDuration(totalDurationMs)
+        const timingStr = timing ? ` in ${timing}` : ''
+        message = `**thinking accomplished** (${lastCommand.client} ${lastCommand.model}${timingStr})`
       }
 
       // the entire prompt has worked!

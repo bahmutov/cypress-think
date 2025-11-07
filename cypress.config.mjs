@@ -18,7 +18,7 @@ export default defineConfig({
       }
       const ollamaOptions = {
         client: 'ollama',
-        model: 'deepseek-r1:14b', // 'codellama',
+        model: 'deepseek-r1:32b', // 'codellama',
       }
       const aiOptions = {
         temperature: 0.1,
