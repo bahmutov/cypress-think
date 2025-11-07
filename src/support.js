@@ -8,6 +8,9 @@ const buttonClasses = `border border-solid rounded rounded-[4px] flex cy-button-
  * @returns {string} Humanized duration (e.g., "300ms", "1.2s", "50s", "1m10s")
  */
 function humanizeDuration(ms) {
+  if (ms === undefined || ms === null || ms === 0) {
+    return ''
+  }
   const roundedMs = Math.round(ms)
   if (roundedMs < 1000) {
     return `${roundedMs}ms`
@@ -160,11 +163,10 @@ Cypress.Commands.add(
                   `🤖⚡️ ${command} (${totalTokens} tokens saved)`,
                 )
               } else {
-                const timing = durationMs
-                  ? ` in ${humanizeDuration(durationMs)}`
-                  : ''
+                const timing = humanizeDuration(durationMs)
+                const timingStr = timing ? ` in ${timing}` : ''
                 cy.log(
-                  `🤖 ${command} (${totalTokens} tokens used${timing})`,
+                  `🤖 ${command} (${totalTokens} tokens used${timingStr})`,
                 )
               }
 
