@@ -8,19 +8,20 @@ const buttonClasses = `border border-solid rounded rounded-[4px] flex cy-button-
  * @returns {string} Humanized duration (e.g., "300ms", "1.2s", "50s", "1m10s")
  */
 function humanizeDuration(ms) {
-  if (ms < 1000) {
-    return `${ms}ms`
-  } else if (ms < 60000) {
+  const roundedMs = Math.round(ms)
+  if (roundedMs < 1000) {
+    return `${roundedMs}ms`
+  } else if (roundedMs < 60000) {
     // Less than 1 minute
-    const seconds = (ms / 1000).toFixed(1)
+    const seconds = (roundedMs / 1000).toFixed(1)
     // Remove trailing .0
     return seconds.endsWith('.0')
       ? `${parseInt(seconds)}s`
       : `${seconds}s`
   } else {
     // 1 minute or more
-    const minutes = Math.floor(ms / 60000)
-    const seconds = Math.round((ms % 60000) / 1000)
+    const minutes = Math.floor(roundedMs / 60000)
+    const seconds = Math.round((roundedMs % 60000) / 1000)
     if (seconds === 0) {
       return `${minutes}m`
     }
