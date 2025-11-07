@@ -359,6 +359,7 @@ export default function cypressThinkPlugin(
           fromCache: true,
           client: cached.client,
           model: cached.model,
+          durationMs: cached.durationMs,
         }
       }
       const result = await think(
@@ -388,6 +389,7 @@ export default function cypressThinkPlugin(
         fromCache: false,
         client: result.client,
         model: result.model,
+        durationMs: result.durationMs,
         promptHash,
       }
     },

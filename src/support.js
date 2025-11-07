@@ -2,6 +2,36 @@
 
 const buttonClasses = `border border-solid rounded rounded-[4px] flex cy-button-width font-medium items-center transition duration-150 hover:shadow-ring-hover focus:shadow-ring-focus active:shadow-ring-focus disabled:hover:shadow-none disabled:cursor-not-allowed focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:outline-none text-white border-white/20 hocus:border-white/60 disabled:hocus:shadow-none hocus:shadow-white/20 disabled:text-gray-700 disabled:hocus:border-white/20 disabled:border-white/20 focus:ring-gray-200 text-[14px] leading-[18px] min-h-[20px] px-[8px] py-[4px]`
 
+/**
+ * Humanize duration in milliseconds
+ * @param {number} ms - Duration in milliseconds
+ * @returns {string} Humanized duration (e.g., "300ms", "1.2s", "50s", "1m10s")
+ */
+function humanizeDuration(ms) {
+  if (ms === undefined || ms === null || ms === 0) {
+    return ''
+  }
+  const roundedMs = Math.round(ms)
+  if (roundedMs < 1000) {
+    return `${roundedMs}ms`
+  } else if (roundedMs < 60000) {
+    // Less than 1 minute
+    const seconds = (roundedMs / 1000).toFixed(1)
+    // Remove trailing .0
+    return seconds.endsWith('.0')
+      ? `${parseInt(seconds)}s`
+      : `${seconds}s`
+  } else {
+    // 1 minute or more
+    const minutes = Math.floor(roundedMs / 60000)
+    const seconds = Math.round((roundedMs % 60000) / 1000)
+    if (seconds === 0) {
+      return `${minutes}m`
+    }
+    return `${minutes}m${seconds}s`
+  }
+}
+
 Cypress.Commands.add(
   'think',
   {
@@ -125,6 +155,7 @@ Cypress.Commands.add(
               fromCache,
               client,
               model,
+              durationMs,
               promptHash,
             }) => {
               if (fromCache) {
@@ -132,7 +163,11 @@ Cypress.Commands.add(
                   `🤖⚡️ ${command} (${totalTokens} tokens saved)`,
                 )
               } else {
-                cy.log(`🤖 ${command} (${totalTokens} tokens used)`)
+                const timing = humanizeDuration(durationMs)
+                const timingStr = timing ? ` in ${timing}` : ''
+                cy.log(
+                  `🤖 ${command} (${totalTokens} tokens used${timingStr})`,
+                )
               }
 
               // replace placeholders in the command

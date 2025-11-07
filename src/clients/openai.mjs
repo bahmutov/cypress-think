@@ -56,12 +56,15 @@ ${agentInstructions}
     ${prompt}
   `
 
+  const startTime = Date.now()
   const response = await client.responses.create({
     model,
     instructions,
     input,
     ...aiOptions,
   })
+  const endTime = Date.now()
+  const durationMs = endTime - startTime
 
   const output = response.output_text.trim()
   console.error('model %s response:\n%s\n', model, output)
@@ -73,5 +76,6 @@ ${agentInstructions}
     totalTokens: response.usage?.total_tokens || 0,
     client: 'openai',
     model,
+    durationMs,
   }
 }
