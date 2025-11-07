@@ -44,6 +44,7 @@ ${agentInstructions}
   `
 
   try {
+    const startTime = Date.now()
     const response = await ollama.generate({
       model: 'codellama',
       prompt: input,
@@ -51,6 +52,9 @@ ${agentInstructions}
       stream: false,
       options: aiOptions,
     })
+    const endTime = Date.now()
+    const durationMs = endTime - startTime
+
     console.log(response.response)
     console.log('input tokens:', response.prompt_eval_count)
     console.log('output tokens:', response.eval_count)
@@ -78,6 +82,7 @@ ${agentInstructions}
       totalTokens: totalTokens,
       client: 'ollama',
       model,
+      durationMs,
     }
   } catch (error) {
     console.error('Error during Ollama API call:', error)
